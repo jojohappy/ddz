@@ -15,11 +15,7 @@ var config = {
   },
 
   test: function() {
-    return _.merge(defaultConfig,{
-      database:{
-        backend: 'memdown',
-      }
-    });
+    return _.merge(defaultConfig,{});
   },
 
   production: function() {
