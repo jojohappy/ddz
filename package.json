@@ -1,0 +1,17 @@
+{
+  "name": "ddz",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "body-parser": "~1.13.2",
+    "debug": "~2.2.0",
+    "ejs": "^2.4.2",
+    "express": "~4.13.1",
+    "morgan": "~1.6.1",
+    "response-time": "^2.3.1",
+    "wechat-crypto": "^0.0.2"
+  }
+}
