@@ -22,11 +22,9 @@ logger.token('body', function(req, res){ return util.inspect(req.body, {depth:nu
 app.use(logger(':method :url :status :response-time ms :res[content-length] bytes with :body', logOptions));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-
 // app.use(bodyParser.text({type: "*/xml"}));
-// app.use('/weixin/callback', weixin.callback);
-app.use('/weixin/callback', weixin(config));
 
+app.use('/weixin/callback', weixin(config));
 app.get('/weixin/hello', function(req, res, next) {
   res.send('hello world! ' + req.query.name);
 });
