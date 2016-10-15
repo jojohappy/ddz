@@ -119,7 +119,7 @@ function analysis(corpApi, text, fromUserName) {
           return sendMsg(corpApi, '失败' + msg, fromUserName);
         }
         else {
-          return sendMsg(corpApi, '开设成功! 访问地址:' + data.url, fromUserName);
+          return sendMsg(corpApi, '开设成功! 访问地址 ' + data.url, fromUserName);
         }
       });
     }
