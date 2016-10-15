@@ -1,14 +1,21 @@
-var WXBizMsgCrypt = require('wechat-crypto');
+var corp = require('wechat-enterprise');
 
-exports.callback = function (req, res) {
-  var weixin = req.app.get('weixin');
-  var cryptor = new WXBizMsgCrypt(weixin.token, weixin.encodingAESKey, weixin.corpId);
-  var echostr = req.query.echostr;
-  if (echostr) {
-    var r = cryptor.decrypt(echostr);
-    res.send(r.message);
-  }
-  else {
-    res.sendStatus(200);
-  }
+module.exports = function(config) {
+  var wx = corp(config);
+
+  return wx
+    .text(function(text, req, res) {
+      console.log('geting text ...', text);
+      res.sendStatus(200);
+    })
+    .voice(function(voice, req, res) {
+      console.log('geting voice ...', voice);
+
+      res.sendStatus(200);
+    })
+    .event(function (event, req, res) {
+      console.log('geting event ...', event);
+      res.sendStatus(200);
+    })
+    .middlewarify()
 };
