@@ -1,4 +1,5 @@
 var express = require('express');
+var fs = require('fs')
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
@@ -19,7 +20,9 @@ app.set('view engine', 'ejs');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-app.use(logger('dev'));
+
+var accessLogStream = fs.createWriteStream('/var/log/ddz.log', {flags: 'a'});
+app.use(logger('dev', {stream: accessLogStream}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(responseTime());
