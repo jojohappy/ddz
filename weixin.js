@@ -95,6 +95,7 @@ function sendMsg(corpApi, text, fromUserName) {
 }
 
 function analysis(corpApi, text, fromUserName) {
+  console.log('text is ' + text);
   Analysis.analysis(text, function(err, site) {
     var msg = text;
     if (err || !site) {
