@@ -36,23 +36,14 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// will print stacktrace
-if (app.get('env') === 'development') {
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    console.trace(err);
-  });
-}
-
-// production error handler
-// no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.send({
-    message: err.message,
-    error: {}
-  });
+  if (app.get('env') === 'development') {
+    console.trace(err);
+  }
+  res.send(err.message);
 });
+
 
 var hostname = process.env.HOST || '127.0.0.1';
 var port = process.env.PORT || 3521;
