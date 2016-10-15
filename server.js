@@ -3,31 +3,31 @@ var fs = require('fs')
 var path = require('path');
 var logger = require('morgan');
 var bodyParser = require('body-parser');
-var responseTime = require('response-time');
-var responseLog = require('./middleware/request_log');
-var wxConfig = require('./config').weixin;
+var util = require('util')
 
-var routes = require('./routes/index');
+var config = require('./config').weixin;
+var weixin = require('./weixin');
 
 var app = express();
 module.exports = app; // for testing
 
-app.use(responseLog);
-
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');
+// set config
+app.set('weixin', config);
 
-// uncomment after placing your favicon in /public
-//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
-
-var accessLogStream = fs.createWriteStream('/var/log/ddz.log', {flags: 'a'});
-app.use(logger('dev', {stream: accessLogStream}));
+var logOptions = {};
+logger.token('body', function(req, res){ return util.inspect(req.body, {depth:null}); })
+app.use(logger(':method :url :status :response-time ms :res[content-length] bytes with :body', logOptions));
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(responseTime());
+app.use(bodyParser.text({type: "*/xml"}));
+app.use(bodyParser.urlencoded({ extended: true }));
 
-app.use('/dj-test', routes);
+app.use('/weixin/callback', weixin.callback);
+app.get('/weixin/hello', function(req, res, next) {
+  res.send('hello world! ' + req.query.name);
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -36,17 +36,11 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// set weixin configure
-app.set('wxConfig', wxConfig);
-
-// error handlers
-
-// development error handler
 // will print stacktrace
 if (app.get('env') === 'development') {
   app.use(function(err, req, res, next) {
     res.status(err.status || 500);
-    console.log(err);
+    console.trace(err);
   });
 }
 
@@ -54,7 +48,7 @@ if (app.get('env') === 'development') {
 // no stacktraces leaked to user
 app.use(function(err, req, res, next) {
   res.status(err.status || 500);
-  res.render('error', {
+  res.send({
     message: err.message,
     error: {}
   });
