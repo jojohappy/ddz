@@ -10,7 +10,11 @@ var defaultConfig = {
   },
   'baidu': {
     apiKey: "xxx",
-    secretKey: "xxx",
+    secretKey: "xxx"
+  },
+  qcloud: {
+    secretId: 'xxx',
+    secretKey: 'xxx'
   }
 };
 
