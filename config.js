@@ -7,6 +7,10 @@ var defaultConfig = {
     encodingAESKey: 'xxx',
     corpSecret: 'xxx',
     corpId: 'xxx'
+  },
+  'baidu': {
+    apiKey: "xxx",
+    secretKey: "xxx",
   }
 };
 
