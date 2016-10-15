@@ -1,7 +1,10 @@
 var request = require('request');
 var corp = require('wechat-enterprise');
+var uuid = require('uuid');
 var baidu = require('./config').baidu;
 var weixin = require('./config').weixin;
+var Analysis = require('./lib/analysis');
+var Jobs = require('./lib/jobs');
 
 var AUTH_URL = "https://openapi.baidu.com/oauth/2.0/token";
 var VOP_URL = "http://vop.baidu.com/server_api";
@@ -74,6 +77,54 @@ function recognize(data, format, done) {
   });
 }
 
+function sendMsg(corpApi, text, fromUserName) {
+  corpApi.send({
+    "touser": fromUserName
+  }, {
+   "msgtype": "text",
+   "text": {
+     "content": text
+   },
+   "safe":"0"
+  }, function(err, data) {
+    console.log('resp with', data);
+    if (err) {
+      console.error(err);
+    }
+  });
+}
+
+function analysis(corpApi, text, fromUserName) {
+  Analysis.analysis(text, function(err, site) {
+    var msg = text;
+    if (err || !site) {
+      return sendMsg(corpApi, err, fromUserName);
+    }
+    else {
+      sendMsg(corpApi, msg, fromUserName);
+      var job = Jobs.add({
+        type: 'establish',
+        operation: 'establish',
+        options: {
+          project: site.project,
+          honest: site.url,
+          mock: uuid.v1().split('-')[0] + '.i16.tv'
+        },
+        id: -99
+      });
+
+      job.on('close', function(data) {
+        if (data.status === 'failed') {
+          return sendMsg(corpApi, '失败' + msg, fromUserName);
+        }
+        else {
+          return sendMsg(corpApi, '开设成功! 访问地址:' + data.url, fromUserName);
+        }
+      });
+    }
+  });
+}
+
 module.exports = function(config) {
   var wx = corp(config);
   var corpApi = new corp.API(
@@ -85,6 +136,7 @@ module.exports = function(config) {
   return wx
     .text(function(text, req, res) {
       console.log('geting text ...', text);
+      analysis(corpApi, text['Content'], text['FromUserName']);
       res.sendStatus(200);
     })
     .voice(function(voice, req, res) {
@@ -100,21 +152,7 @@ module.exports = function(config) {
             }
             else {
               console.log('Voice recognization:', body);
-              var text = body.result[0];
-              corpApi.send({
-                "touser": voice['FromUserName']
-              }, {
-               "msgtype": "text",
-               "text": {
-                 "content": text
-               },
-               "safe":"0"
-              }, function(err, data) {
-                console.log('resp with', data);
-                if (err) {
-                  console.error(err);
-                }
-              });
+              analysis(corpApi, body.result[0], voice['FromUserName']);
             }
           })
         }
