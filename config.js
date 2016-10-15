@@ -2,8 +2,10 @@ var _ = require('lodash');
 
 var defaultConfig = {
   weixin: {
+    agentId: 0,
     token: 'xxx',
     encodingAESKey: 'xxx',
+    corpSecret: 'xxx',
     corpId: 'xxx'
   }
 };
