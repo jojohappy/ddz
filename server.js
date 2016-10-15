@@ -4,7 +4,7 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 var responseTime = require('response-time');
 var responseLog = require('./middleware/request_log');
-var weixin = require('./config').weixin;
+var wxConfig = require('./config').weixin;
 
 var routes = require('./routes/index');
 
@@ -33,8 +33,8 @@ app.use(function(req, res, next) {
   next(err);
 });
 
-// set weixin
-app.set('weixin', weixin);
+// set weixin configure
+app.set('wxConfig', wxConfig);
 
 // error handlers
 
@@ -62,3 +62,4 @@ var port = process.env.PORT || 3521;
 app.listen(port, hostname, function() {
   console.log('try this:\ncurl http://' + hostname + ':' + port + '/hello?name=Scott');
 });
+
